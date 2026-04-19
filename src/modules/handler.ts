@@ -12,7 +12,7 @@ export default class Handler {
   private constructor() {}
 
   public static async Init(): Promise<void> {
-    if (!fs.existsSync("data")) {
+    if (!fs.existsSync("data/backups")) {
       Logger.Debug("Initalizing data folder...");
 
       fs.mkdirSync("data/backups", { recursive: true });
