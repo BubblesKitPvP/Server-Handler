@@ -16,6 +16,10 @@ export default class Handler {
       Logger.Debug("Initalizing data folder...");
 
       fs.mkdirSync("data/backups", { recursive: true });
+    }
+    if (!fs.existsSync("data/backups.json")) {
+      Logger.Debug("Initalizing backups.json...");
+
       fs.writeFileSync("data/backups.json", "[]", "utf8");
     }
 
@@ -122,7 +126,7 @@ export default class Handler {
             break;
           case 2:
             Logger.Warn(
-              "Server installation failed due to the server already being installed!"
+              "Server installation failed due to the server already being installed!",
             );
             resolve(false);
             break;
@@ -136,7 +140,7 @@ export default class Handler {
   }
   public static async Backup(
     isProtected?: boolean,
-    name?: string
+    name?: string,
   ): Promise<boolean> {
     const id = v4();
 
@@ -168,7 +172,7 @@ export default class Handler {
             const deleted = await this.DeleteOldBackups();
 
             Logger.Notice(
-              `Server backed up successfully! Deleted ${deleted} old backups.`
+              `Server backed up successfully! Deleted ${deleted} old backups.`,
             );
             resolve(true);
             break;
@@ -258,7 +262,7 @@ export default class Handler {
       .filter((backup) => !backup.protected)
       .sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
 
     if (config.auto_backup_retention >= backups.length) {
@@ -271,7 +275,7 @@ export default class Handler {
       fs.rmSync(`data/backups/${backup.id}.tar.gz`);
 
       const backups = FileManager.ReadBackups().filter(
-        (b) => b.id !== backup.id
+        (b) => b.id !== backup.id,
       );
 
       FileManager.WriteBackups(backups);
@@ -311,10 +315,13 @@ export default class Handler {
 
     Logger.Debug("Automatic backup loop started.");
 
-    setInterval(() => {
-      Logger.Info("Running automatic backup...");
-      this.Backup();
-    }, config.auto_backup_speed * 1000 * 60);
+    setInterval(
+      () => {
+        Logger.Info("Running automatic backup...");
+        this.Backup();
+      },
+      config.auto_backup_speed * 1000 * 60,
+    );
   }
   private static RestartLoop(): void {
     const config = FileManager.ReadConfig();
@@ -324,7 +331,7 @@ export default class Handler {
     }
     if (config.auto_restart_timing.length === 0) {
       Logger.Warn(
-        "Automatic restart is enabled but no timings are set. Ignoring..."
+        "Automatic restart is enabled but no timings are set. Ignoring...",
       );
       return;
     }
